@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Ninja - Recipe App</title>
+    <meta name="description" content="A simple Ninja Recpie App with vanilla JS and Tailwind CSS" />
+    <meta name="keywords" content="HTML, CSS, JavaScript, Vanilla JS, Tailwind, TailwindCSS, Tailwind CSS, SandeepKushwaha, Sandeep, Sandeep Kushwaha Todo App, Frontend Coding Ninjas Recipe App, Coding Ninjas Frontend Skill Test, Recipe Web App, Ninja Recipe Web App, Ninja Recipe " />
+    <meta name="author" content="Sandeep Kumar Kushwaha" />
+    <meta name="source-code-profile" content="https://github.com/SandeepKushwaha" />
+    <meta name="social-profile" content="https://twitter.com/MrSandeepKush" />
+    <meta name="twitter:profile" content="MrSandeepKush" />
+    <meta name="github:profile" content="SandeepKushwaha" />
+    <link rel="shortcut icon" href="./images/favicon.png" type="image/x-icon">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style type="text/tailwindcss">
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;0,1000;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900;1,1000&display=swap');
+
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        body::-webkit-scrollbar, div::-webkit-scrollbar  {
+            width: .5em;
+        }
+
+        body::-webkit-scrollbar-track, div::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            @apply bg-slate-800;
+        }
+
+        body::-webkit-scrollbar-thumb, div::-webkit-scrollbar-thumb {
+            /* background-color: #303030; */
+            /* outline: 1px solid #808080; */
+            @apply bg-slate-400;
+        }
+
+        .card {
+            @apply bg-white rounded overflow-hidden shadow relative;
+        }
+
+        .fav-badge {
+            @apply bg-white hover:bg-slate-300 text-primary text-xs uppercase font-bold rounded-full shadow-md p-2 absolute top-0 end-0 mr-2 mt-2 select-none cursor-pointer hover:text-red-500 hover:shadow-lg;
+        }
+
+        .btn {
+            @apply rounded-full px-3 py-2 uppercase text-xs font-bold cursor-pointer tracking-wider;
+        }
+
+        .model-detail-box {
+            @apply bg-gray-700 rounded shadow-md p-8 w-[74%] max-h-[90%] overflow-hidden overflow-y-scroll;
+        }
+
+        .meal-text-title {
+            --max-title-line: 2;
+            max-height: calc(var(--max-title-line) * 1em * var(--line-height));
+            line-height: var(--line-height);
+
+            position: relative;
+
+            @apply text-2xl font-bold;
+        }
+
+        .meal-text-title::before {
+            content: "";
+            position: absolute;
+            height: calc(1.em * var(--line-height));
+            width: 100%;
+            bottom: 0;
+            pointer-events: none;
+            background: linear-gradient(to buttom, transparent, white);
+        }
+
+        .meal-text-description {
+            --max-lines: 5;
+            --line-height: 1.4;
+
+            max-height: calc(var(--max-lines) * 1em * var(--line-height));
+            line-height: var(--line-height);
+
+            position: relative;
+
+            @apply text-sm text-slate-800 text-justify overflow-hidden;
+        }
+
+        .meal-text-description::before {
+            content: "";
+            position: absolute;
+            height: calc(1.em * var(--line-height));
+            width: 100%;
+            bottom: 0;
+            pointer-events: none;
+            background: linear-gradient(to buttom, transparent, white);
+        }
+        .project-features {
+            @apply my-6 ml-8 text-gray-300;
+            list-style-type: decimal;
+        }
+        .social-links {
+            @apply w-full flex flex-col md:flex-row justify-evenly capitalize text-primary font-semibold;
+            letter-spacing: 0.1rem;
+        }
+    </style>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6363',
+                        secondary: {
+                        100: '#E2E2D5',
+                        200: '#888883',
+                        }
+                    },
+                    fontFamily: {
+                        nunito: ['Nunito'], // import nunito in src/styles.css before adding here. 
+                    },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="text-white font-nunito">
+    
+    <div class="grid md:grid-cols-4 gap-0 h-screen max-h-screen md:h-screen"> <!-- Content Wrapper -->
+        <div class="md:col-span-1 md:flex md:justify-end bg-gray-800">
+            <nav class="text-right md:w-full md:fixed">
+                <div class="flex justify-between items-center border-b-0 border-slate-500">
+                    <h1 class="w-full font-bold text-xl uppercase p-4 border-b border-gray-100">
+                        <a href="/" class="hover:text-gray-200" >Food Ninja</a>
+                    </h1>
+                    <div class="px-4 cursor-pointer md:hidden" id="ninja">
+                        <svg class="w-6" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+                          </svg>
+                    </div>
+                </div>
+                <ul class="text-sm mt-6 hidden md:block" id="menu">
+                    <li class="text-gray-50 py-2">
+                        <a id="visitHome" href="#" class="px-4 font-bold text-lg flex justify-end border-r-4 border-primary">
+                            <span>Home</span>
+                            <!-- <svg class="w-5 ml-2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"></path>
+                              </svg> -->
+                            <svg class="w-5 ml-2" data-slot="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M11.47 3.841a.75.75 0 0 1 1.06 0l8.69 8.69a.75.75 0 1 0 1.06-1.061l-8.689-8.69a2.25 2.25 0 0 0-3.182 0l-8.69 8.69a.75.75 0 1 0 1.061 1.06l8.69-8.689Z"></path>
+                                <path d="m12 5.432 8.159 8.159c.03.03.06.058.091.086v6.198c0 1.035-.84 1.875-1.875 1.875H15a.75.75 0 0 1-.75-.75v-4.5a.75.75 0 0 0-.75-.75h-3a.75.75 0 0 0-.75.75V21a.75.75 0 0 1-.75.75H5.625a1.875 1.875 0 0 1-1.875-1.875v-6.198a2.29 2.29 0 0 0 .091-.086L12 5.432Z"></path>
+                              </svg>
+                        </a>
+                    </li>
+                    <li class="py-2">
+                        <a id="visitFavorites" href="#" class="px-4 font-bold text-lg flex justify-end border-r-4 border-white">
+                            <span>Favorites</span>
+                            <!-- <svg class="w-5 ml-2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
+                              </svg> -->
+                            <svg class="w-5 ml-2" data-slot="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
+                              </svg>
+                        </a>
+                    </li>
+                    <li class="py-2">
+                        <a id="visitAbout" href="#" class="px-4 font-bold text-lg flex justify-end border-r-4 border-white">
+                            <span>About</span>
+                            <!-- <svg class="w-5 ml-2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"></path>
+                            </svg> -->
+                            <svg class="w-5 ml-2 font-extrabold" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+                            </svg>                              
+                        </a>
+                    </li>
+                </ul>
+            </nav> 
+        </div> <!-- End of Nav -->
+
+        <main id="homePage" class="px-16 py-8 bg-gray-900 md:col-span-3" >
+            <form id="searchMealForm">
+                <div class="flex justify-center mb-10 md:justify-end">
+                    <!-- <a href="#" class="btn text-primary mr-2 shadow border-primary md:border-2 hover:bg-primary hover:text-white">Login</a>
+                    <a href="#" class="btn text-primary shadow border-primary md:border-2 hover:bg-primary hover:text-white">Sign Up</a> -->
+                    <label for="search" class="hidden">Search</label>
+                    <input type="search" name="search" id="searchItem" class=" p-2 ps-4 text-sm text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search Recipe here ..." required/>
+    
+                    <button id="search" type="submit" class="ml-4 text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-md text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" >
+                        <svg class="w-4 m-2" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"></path>
+                          </svg>
+                          <span class="hidden">search</span>
+                    </button>
+                </div>
+            </form>
+
+            <div id="searchRecipesContents" class="search-recipes mb-12 hidden ">
+                <header>
+                    <h2 class="text-white text-6xl font-semibold" >Recipes Search</h2>
+                    <h3 class="text-gray-300 text-2xl font-semibold">Searching result for <span id="searchingString" class="text-primary font-bold capitalize">"Ninjas"</span></h3>
+                </header>
+
+                <div id="emptySearchResults" class="border rounded-md my-8 bg-slate-600 opacity-80 hidden">
+                    <p class="text-center my-14 font-extrabold">No Result Found</p>                    
+                </div>
+
+                <div id="searchResults" class="my-8 rounded-md hidden ">
+                    <p class="my-2">Total Result Found: <span id="searchedMealCounts" class="font-bold">8</span></p>
+                    <div id="searchMeals" class="w-[96.60%] my-0 mx-auto grid lg:grid-cols-3 gap-10">
+                        <!-- card goes here -->
+                        
+                        <!-- <div class="card shadow-md">
+                            <div class="flex flex-col">
+                                <img src="./images/curry.jpg" alt="curry" class="w-full object-cover" />
+                                
+                                <div class="flex flex-col text-black ml-4 my-4 mr-4">
+                                    <span class="meal-text-title">Recipe Name</span>
+                                    <span class="text-xl font-semibold">Recipe Area</span>
+                                    <span class="text-base font-light">Recipe Category</span>
+                                    <p class="meal-text-description">this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines. this would be the description of the recipe. max line would be 5 lines. or may 50 words. this would be the description of the recipe. max line would be 5 lines.</p>
+                                    <button type="button" class="h-10 w-auto max-w-[50%] mt-2 text-white bg-primary rounded-md">View</button>
+                                </div>
+                                <div id="fav" class="fav-badge">        
+                                    <svg class="w-7 inline-block" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"></path>
+                                      </svg>
+                                </div>
+                            </div>
+                        </div>  -->
+                    </div>
+                </div>
+            </div>
+
+            <header>
+                <h2 class="text-white text-6xl font-semibold" >Recipes</h2>
+                <h3 class="text-gray-300 text-2xl font-semibold">For Ninjas</h3>
+            </header>
+
+            <div id="homePageDynamicDataItems">
+                <h4 class="font-bold mt-16 pb-2 border-b border-gray-200">Latest Recipes</h4>
+                <div id="meals" class="mt-8 grid lg:grid-cols-3 gap-10 ">
+                    <!-- Cards goes here -->
+                    <!-- <div class="card hover:shadow-lg">
+                        <img src="./images/stew.jpg" alt="stew" class="w-full h-48 sm:h-52 object-cover">
+                        <div class="flex flex-row justify-between items-center p-4">
+                            <div class="">
+                                <span class="text-slate-700 font-bold">5 Bean Chilli Stew</span>
+                                <span class="block text-gray-500 text-sm font-bold">English</span>
+                                <span class="text-gray-500 text-xs">British</span>
+                            </div>
+                            <div class="">
+                                <span class="text-white bg-blue-700 text-lg p-2 rounded-md cursor-pointer shadow-md hover:text-gray-50 hover:bg-blue-800">View</span>
+                            </div>
+                        </div>
+                        <div class="fav-badge">
+                            <svg class="w-7 inline-block" data-slot="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
+                              </svg>
+                        </div>
+                    </div>
+                    <div class="card hover:shadow-lg">
+                        <img src="./images/stew.jpg" alt="stew" class="w-full h-48 sm:h-52 object-cover">
+                        <div class="flex flex-row justify-between items-center p-4">
+                            <div class="">
+                                <span class="text-slate-700 font-bold">5 Bean Chilli Stew</span>
+                                <span class="block text-gray-500 text-sm">Recipe By John</span>
+                            </div>
+                            <div class="">
+                                <span class="text-white bg-blue-700 text-lg p-2 rounded-md cursor-pointer shadow-md hover:text-gray-50 hover:bg-blue-800">View</span>
+                            </div>
+                        </div>
+                        <div class="fav-badge">
+                            <svg class="w-7 inline-block" data-slot="icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"></path>
+                              </svg>
+                        </div>
+                    </div> -->
+                </div>
+
+                <!--  ===================================  -->
+                <!-- <h4 class="font-bold mt-16 pb-2 border-b border-gray-200">Most Popular</h4>
+                <div class="mt-8">
+                    <1!-- Cards goes here --1>
+                    <div>
+                        <img src="./images/curry.jpg" alt="curry">
+                        <div>
+                            <span>Curry</span>
+                            <span>Recipe By John</span>
+                        </div>
+                    </div>
+                </div> -->    
+                <div id="loadMore" class="mt-8 flex justify-center">
+                    <div class="btn bg-secondary-100 text-secondary-200 p-1">Load More</div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <main id="favoritesPage" class="text-left px-16 py-8 bg-gray-900 md:col-span-3 hidden">
+            <div class="">
+                <header class="mb-5">
+                    <h2 class="text-white text-4xl md:text-6xl font-semibold" >Favorites Recipes</h2>
+                    <h3 class="text-gray-300 text-xl md:text-2xl font-semibold mt-2">Ninja only repeat's awesome recipe</h3>
+                </header>
+
+                <div class="mt-5 w-full mb-5 text-right">
+                    <span id="clearFavs" class="px-4 py-2 rounded-full bg-red-500 text-white cursor-pointer" >Clear All</span>
+                </div>
+
+                <div id="emptyFavs" class="h-96 max-h-full w-full hidden">
+                    <span class="block text-xl md:text-2xl text-center font-extrabold mt-32">There is No Favorite recipes yet!</span>
+                </div>
+
+                <div id="markAsFavs" class=" max-h-full w-full overflow-hidden overflow-y-auto">
+                    <!-- cards goes here -->
+                    <!-- <div class="fav-item">
+                        <div class="flex justify-between items-center hover:bg-slate-600 p-2 mb-4 rounded-md">
+                            <img src="./images/noodles.jpg" alt="noodles" class="w-24 h-24 object-cover rounded-full border-2 border-spacing-1 border-white mr-4">
+                            <span>My Recipe indian Vegitarian style</span> 
+                            <div class="close-btn p-2 rounded-full hover:bg-red-500 cursor-pointer">
+                                <svg class="w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>                                  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fav-item">
+                        <div class="flex justify-between items-center hover:bg-slate-600 p-2 mb-4 rounded-md">
+                            <img src="./images/noodles.jpg" alt="noodles" class="w-24 h-24 object-cover rounded-full border-2 border-spacing-1 border-white mr-4">
+                            <span>My Recipe indian Vegitarian style</span> 
+                            <div class="close-btn p-2 rounded-full hover:bg-red-500 cursor-pointer">
+                                <svg class="w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>                                  
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fav-item">
+                        <div class="flex justify-between items-center hover:bg-slate-600 p-2 mb-4 rounded-md">
+                            <img src="./images/noodles.jpg" alt="noodles" class="w-24 h-24 object-cover rounded-full border-2 border-spacing-1 border-white mr-4">
+                            <span>My Recipe indian Vegitarian style</span> 
+                            <div class="close-btn p-2 rounded-full hover:bg-red-500 cursor-pointer">
+                                <svg class="w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>                                  
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+            </div>
+        </main>
+
+        <main id="aboutPage" class="text-left px-16 py-8 bg-gray-900 md:col-span-3 hidden">
+            <div class="about-content">
+                <h1 class="text-primary text-6xl md:text-6xl font-semibold mb-16 ">
+                    About
+                </h1>
+                <div class="about-project mt-8 text-base md:text-lg text-justify">
+                    <h3 class="text-white text-4xl md:text-4xl font-semibold mt-2 mb-8 border-b-2 ">About Project</h3>
+                    <h5 class="text-gray-300 text-2xl md:text-2xl font-semibold mt-2 mb-4 text-left">Introducing the Recipe Project: A Culinary Adventure!</h5>
+                    <p class="my-4">
+                        Get ready to embark on a mouthwatering journey with our Recipe Project, developed by none other than Sandeep Kumar Kushwaha. This project beautifully merges HTML, Vanilla JS, and Tailwind CSS to bring you a seamless user experience while exploring and experimenting with a vast database of delicious recipes.
+                    </p>
+                    <p class="my-4">
+                        At the heart of this project lies the powerful and versatile API provided by https://www.themealdb.com/api.php. With this exceptional resource, you'll have access to a plethora of meals to make your taste buds tingle in excitement.
+                    </p>
+                    <p class="my-4">
+                        Let's delve into the functions and features that make this Recipe Project a must-try for all food enthusiasts:
+                    </p>
+                    <ol class="project-features" >
+                        <li class="my-4 list-item">
+                            <span class="text-white font-semibold">Explore Random Meals:</span> Ever wanted to try something new and exciting? Well, with our home page, you can dive into the world of surprise recipes! Discover unique meals curated randomly by the project API. From exotic delicacies to comforting classics, there's always something sensational waiting for you.
+                        </li>
+                        <li class="my-4 list-item">
+                            <span class="text-white font-semibold">View Meal Details:</span> Curiosity piqued by a particular meal? Simply click on it, and you'll be greeted with a detailed view that includes ingredient lists, preparation instructions, and even accompanying images. Feel empowered to experiment with flavors and techniques as you explore the intricacies of each dish.
+                        </li>
+                        <li class="my-4">
+                            <span class="text-white font-semibold">Mark Favorite Meals:</span> Have you ever come across a recipe that made your taste buds dance with joy? With our built-in favorite feature, you can now mark any meal as your personal favorite. Keep track of those scrumptious gems that you want to revisit again and again. Because every cooking journey needs a dash of personal touch!
+                        </li>
+                        <li class="my-4">
+                            <span class="text-white font-semibold">Search Meals:</span> Have a specific dish in mind? Our search functionality allows you to find meals based on name, category, or even specific ingredients. Whether you're craving a comforting pasta or an indulgent dessert, the Recipe Project has got you covered. Once you find your desired meal, you can either view its details or add it to your favorites for future reference.
+                        </li>
+                    </ol>
+                    <p class="my-4">
+                        With the Recipe Project, Sandeep Kumar Kushwaha has created an interactive and visually stunning platform that brings the joy of cooking right to your fingertips. Unleash your culinary creativity, broaden your repertoire of recipes, and savor the satisfaction of every delicious meal you create.
+                    </p>
+                    <p class="my-4">
+                        So, what are you waiting for? Get ready to spice up your culinary game with the Recipe Project! Experience the seamless blend of HTML, Vanilla JS, and Tailwind CSS, and embark on a gastronomic adventure like no other. Happy cooking!
+                    </p>
+                </div>
+                <div class="about-developer mt-16 text-base md:text-lg text-justify">
+                    <h3 class="text-white text-4xl md:text-4xl font-semibold mt-2 mb-8 border-b-2 ">About Developer</h3>
+                    
+                    <div class="flex flex-row justify-start items-center text-left">
+                        
+                        <div class="developer-text-img mr-8">
+                            <img class="border-2 border-spacing-1 rounded-full" width="112px" src="https://avatars.githubusercontent.com/u/16320499?v=4" alt="Sandeep Kumar Kushwaha" />
+                        </div>
+
+                        <div class="developer-text-content flex flex-col">
+                            <h5 class="text-slate-100 text-2xl font-bold mt-2">Sandeep Kumar Kushwaha</h5>
+                            <h5 class="text-gray-300 text-base font-semibold mb-4">Designed and Created this Frontend Develeopment based Project.</h5>
+                        </div>
+
+                    </div>
+
+                    <h5 class="mt-8 mb-10 text-white text-lg text-center font-semibold">Check out his Social Links</h5>
+
+                    <div class="social-links">
+                        <a href="mailto:sandeepkush327@gmail.com" class="flex flex-auto items-center justify-center mx-10 rounded-sm shadow-md my-2 px-1 py-2 hover:text-cyan-500 hover:shadow-2xl" >
+                            <span>
+                                <svg class="w-6 m-2 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                </svg>                                  
+                            </span>
+                            <span class="leading-3 mt-2 mb-2">email</span>
+                        </a>
+                        <a href="http://github.com/SandeepKushwaha" target="_blank" rel="noopener noreferrer" class="flex flex-auto items-center justify-center mx-10 rounded-sm shadow-md my-2 px-1 py-2 hover:text-stone-500 hover:shadow-2xl">
+                            <span>
+                                <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 mr-2 inline-block"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                                </svg>
+                            </span>
+                            <span class="leading-3 mt-1">Github</span>
+                        </a>
+                        <a href="http://twitter.com/MrSandeepKush" target="_blank" rel="noopener noreferrer"class="flex flex-auto items-center justify-center mx-10 rounded-sm shadow-md my-2 px-1 py-2 hover:text-slate-50 hover:shadow-2xl">
+                            <span>
+                                <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4 mr-2 inline-block"
+                                fill="currentColor"
+                                viewBox="0 0 24 24">
+                                    <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                </svg>
+                            </span>
+                            <span class="leading-3 mt-1">Twitter</span>
+                        </a>
+                        <a href="http://linkedin.com/in/MrSandeepKuhwaha" target="_blank" rel="noopener noreferrer" class="flex flex-auto items-center justify-center mx-10 rounded-sm shadow-md my-2 px-1 py-2 hover:text-blue-600 hover:shadow-2xl">
+                            <span>
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline-block" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M4.98 3.5c0 1.381-1.11 2.5-2.48 2.5s-2.48-1.119-2.48-2.5c0-1.38 1.11-2.5 2.48-2.5s2.48 1.12 2.48 2.5zm.02 4.5h-5v16h5v-16zm7.982 0h-4.968v16h4.969v-8.399c0-4.67 6.029-5.052 6.029 0v8.399h4.988v-10.131c0-7.88-8.922-7.593-11.018-3.714v-2.155z" />
+                            </svg>
+                            </span>
+                            <span class="leading-3 mt-2">LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Model for Recipe Details -->
+        <div id="modelDetail" class="fixed top-0 left-0 bg-black bg-opacity-50 w-screen h-screen justify-center items-center hidden z-10">
+            <div class="model-detail-box">
+                <div class="">
+                    <div class="flex justify-between border-b-2 border-b-slate-200 pb-4">
+                        <div class="">
+                            <h2 id="recipeDetailTitle" class="text-4xl font-extrabold">My Recipe Name</h2>
+                            <span id="recipeDetailArea" class="text-xl font-extrabold">Indian</span>
+                            <span id="recipeDetailCategory" class="font-bold text-gray-400">Vegitarian</span>
+                        </div>
+                        <div class="close-model-btn" id="closeModelBtn">
+                            <span class="text-red-600 hover:text-red-900 p-0.5 rounded-full font-bold inline-block bg-white cursor-pointer">
+                                <!-- <svg class="w-6" data-slot="icon" fill="none" stroke-width="1.5" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"></path>
+                                    </svg> -->
+                                <svg class="w-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                </svg> 
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-12 flex flex-col md:flex-row justify-between items-start border-b-2 border-b-slate-200 pb-8">
+                    <div class="md:mr-16 min-w-96">
+                        <img id="recipeDetailThumb" class="rounded-md" src="https://www.themealdb.com/images/media/meals/yyrrxr1511816289.jpg" alt="curry" />
+                    </div>
+                    <div class="mr-16 mt-6 md:mt-0">
+                        <h4 class="text-2xl font-bold">Ingredients</h4>
+                        <table id="recipeDetailTableIngredients" class="mt-6 ml-2 mr-2 rounded-md p-8 w-full bg-opacity-20 bg-gray-950">
+                            <tbody id="recipeDetailTBodyIngredients" class="rounded-md hover:rounded-md">
+                                <!-- <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr>
+                                <tr class="hover: bg-opacity-30 hover:bg-gray-950 hover:rounded-md">
+                                    <td class="px-4 py-2 text-left uppercase">onine paste</td>
+                                    <td class="px-4 py-2 text-right uppercase">1</td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                </div>
+                
+                <div class="mt-8 mb-8 pb-8">
+                    <h4 class="text-2xl font-bold mb-6">Instructions</h4>
+                    <p id="recipeDetailInstructions" class="text-justify">In a large pot of salted water, cook the potatoes until they are very tender. Drain.\r\nWith a masher, coarsely crush the potatoes with at least 30 ml (2 tablespoons) of butter. With an electric mixer, purée with the milk. Season with salt and pepper. Set aside.\r\nWith the rack in the middle position, preheat the oven to 190 °C (375 °F).\r\nIn a large skillet, brown the onion in the remaining butter. Add the meat and cook until golden brown. Season with salt and pepper. Remove from the heat.\r\nLightly press the meat at the bottom of a 20-cm (8-inch) square baking dish. Cover with the corn and the mashed potatoes. Sprinkle with paprika and parsley.\r\nBake for about 30 minutes. Finish cooking under the broiler. Let cool for 10 minutes.</p>
+                </div>
+
+                <div id="recipeDetailTags" class="mb-8">
+                    <!-- <span class="rounded-full p-2 text-white bg-rose-300 mr-4">tag 1</span> -->
+                    <!-- <span class="rounded-full p-2 text-white bg-rose-600 mr-4">tag 2</span> -->
+                </div>
+                
+                <div class="relative overflow-hidden pt-[56.25%] rounded-md">
+                    <iframe id="recipeDetailYouTube" class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/QRFqnLkEv3I" title="Youtube" frameborder="0" allowfullscreen></iframe>
+                </div>
+
+                <div class="mt-2 text-center">
+                    <a id="recipeDetailSource" class="text-primary hover:text-rose-600" href="https://www.ricardocuisine.com/en/recipes/5541-pate-chinois-shepherd--s-pie-" target="_blank" rel="noopener noreferrer">visit source</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>
