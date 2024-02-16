@@ -20,7 +20,10 @@ So, what are you waiting for? Get ready to spice up your culinary game with the 
 ## Snapshots
 
 Desktop Views
+<<<<<<< HEAD
 
+=======
+>>>>>>> ff67b59823091cc18cec403fb83249e105f4ef72
 ![Home Page](snaps/food-ninja-home-page.jpg)
 ![Recipe Details](snaps/food-ninja-recipe-details.jpg)
 ![No Search Results](snaps/food-ninja-no-search-results.jpg)
@@ -29,6 +32,9 @@ Desktop Views
 ![About Page](snaps/food-ninja-about-page.jpg)
 
 Mobile Responsive Views
+<<<<<<< HEAD
 
+=======
+>>>>>>> ff67b59823091cc18cec403fb83249e105f4ef72
 ![Home Page in Mobile](snaps/food-ninja-mobile-home-page.jpg)
 ![Favorites Page](snaps/food-ninja-mobile-favorites-page.jpg)
