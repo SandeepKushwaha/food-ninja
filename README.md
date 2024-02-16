@@ -1,8 +1,6 @@
 # Food Ninja 
 
-## About Project
-
-#### Introducing the Recipe Project: A Culinary Adventure!
+## Introducing the Recipe Project: A Culinary Adventure!
 
 Get ready to embark on a mouthwatering journey with our Recipe Project, developed by none other than Sandeep Kumar Kushwaha. This project beautifully merges **HTML**, **Vanilla JS**, and **Tailwind CSS** to bring you a seamless user experience while exploring and experimenting with a vast database of delicious recipes.
 
@@ -18,3 +16,19 @@ Let's delve into the functions and features that make this Recipe Project a must
 With the Recipe Project, Sandeep Kumar Kushwaha has created an interactive and visually stunning platform that brings the joy of cooking right to your fingertips. Unleash your culinary creativity, broaden your repertoire of recipes, and savor the satisfaction of every delicious meal you create.
 
 So, what are you waiting for? Get ready to spice up your culinary game with the Recipe Project! Experience the seamless blend of HTML, Vanilla JS, and Tailwind CSS, and embark on a gastronomic adventure like no other. Happy cooking!
+
+## Snapshots
+
+Desktop Views
+
+![Home Page](snaps/food-ninja-home-page.jpg)
+![Recipe Details](snaps/food-ninja-recipe-details.jpg)
+![No Search Results](snaps/food-ninja-no-search-results.jpg)
+![Search Results](snaps/food-ninja-search-results.jpg)
+![Favorites Page](snaps/food-ninja-favorites-page.jpg)
+![About Page](snaps/food-ninja-about-page.jpg)
+
+Mobile Responsive Views
+
+![Home Page in Mobile](snaps/food-ninja-mobile-home-page.jpg)
+![Favorites Page](snaps/food-ninja-mobile-favorites-page.jpg)
